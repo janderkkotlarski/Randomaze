@@ -42,11 +42,19 @@ class pattern
         m_sprite.setPosition(m_posit);
     }
 
+    void set_sprite()
+    {
+        set_texture();
+        set_color();
+        set_posit();
+    }
+
     public:
 
     void reposit(const sf::Vector2f& posit)
     {
         m_posit = posit;
+        set_posit();
     }
 
     void recolor(const sf::Color& color)
@@ -58,6 +66,18 @@ class pattern
     void display(sf::RenderWindow& window)
     {
         window.draw(m_sprite);
+    }
+
+    pattern(const std::string& filename, const sf::Color& color,
+            const sf::Vector2f& posit)
+        : m_filename(filename), m_color(color), m_posit(posit),
+          m_texture(), m_sprite()
+    {
+        set_sprite();
+    }
+
+    ~pattern()
+    {
     }
 };
 
