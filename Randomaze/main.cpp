@@ -151,6 +151,7 @@ class tile
 int main()
 {
     const std::string program_name{"Randomaze V0.1"};
+
     return 0;
 }
 
