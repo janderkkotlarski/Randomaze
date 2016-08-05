@@ -1,0 +1,21 @@
+sudo: require
+language: cpp
+compiler: gcc
+
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-add-repository ppa:sonkun/sfml-development -y
+  - sudo apt-get update -qq
+
+install: 
+  - sudo apt-get install -qq g++-5  
+  - sudo apt-get install libsfml-dev
+
+script: 
+  - cd Randomaze
+  - qmake
+  - make
+  - ./Randomaze
+
+
+
