@@ -93,7 +93,7 @@ class tile
 
     int m_type{1};
 
-    sf::Color m_color{m_dark};
+    sf::Color m_color{m_dark};    
 
     void color_tile()
     {
@@ -148,10 +148,45 @@ class tile
 
 };
 
+
+int window_maker(const std::string& program_name, const float windim)
+{
+    sf::Color black{0, 0, 0};
+
+    sf::RenderWindow window(sf::VideoMode(windim, windim), program_name, sf::Style::Default);
+
+    while (window.isOpen())
+    {
+        sf::Event event;
+
+        window.clear(black);
+        window.display();
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            window.close();
+            return 0;
+        }
+
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
 int main()
 {
     const std::string program_name{"Randomaze V0.1"};
 
-    return 0;
+    const float windim{512.0f};
+
+    return window_maker(program_name, windim);
 }
 

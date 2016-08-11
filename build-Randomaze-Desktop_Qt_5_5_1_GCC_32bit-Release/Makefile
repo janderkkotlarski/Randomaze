@@ -10,11 +10,11 @@ MAKEFILE      = Makefile
 
 ####### Compiler, tools and options
 
-CC            = gcc
-CXX           = g++
+CC            = gcc-5
+CXX           = g++-5
 DEFINES       = 
 CFLAGS        = -m32 -pipe -O2 -Wall -W -fPIC $(DEFINES)
-CXXFLAGS      = -m32 -pipe -std=c++11 -Wall -Wextra -Weffc++ -O2 -std=c++0x -Wall -W -fPIC $(DEFINES)
+CXXFLAGS      = -m32 -pipe -Wall -Wextra -Weffc++ -std=c++11 -O2 -std=c++0x -Wall -W -fPIC $(DEFINES)
 INCPATH       = -I../Randomaze -I. -I/opt/Qt5.5.1/5.5/gcc/mkspecs/linux-g++-32
 QMAKE         = /opt/Qt5.5.1/5.5/gcc/bin/qmake
 DEL_FILE      = rm -f
@@ -34,7 +34,7 @@ TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = Randomaze1.0.0
 DISTDIR = /media/jan/5e2b9d7f-0525-4f0a-a80d-2463e509a816/home/jan/Data/C++/Randomaze/build-Randomaze-Desktop_Qt_5_5_1_GCC_32bit-Release/.tmp/Randomaze1.0.0
-LINK          = g++
+LINK          = g++-5
 LFLAGS        = -m32 -Wl,-O1 -Wl,-rpath,/opt/Qt5.5.1/5.5/gcc
 LIBS          = $(SUBLIBS) -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio 
 AR            = ar cqs
