@@ -151,6 +151,11 @@ class tile
 
 int window_maker(const std::string& program_name, const float windim)
 {
+    const float millis{10.0f};
+
+    sf::Clock clock;
+    sf::Time time;
+
     sf::Color black{0, 0, 0};
 
     sf::RenderWindow window(sf::VideoMode(windim, windim), program_name, sf::Style::Default);
@@ -175,6 +180,14 @@ int window_maker(const std::string& program_name, const float windim)
                 window.close();
                 return 0;
             }
+        }
+
+        time = clock.getElapsedTime();
+
+        if(time.asSeconds() > millis)
+        {
+            window.close();
+            return 0;
         }
     }
 
