@@ -13,6 +13,8 @@ class pattern
 
     sf::Vector2f m_posit;
 
+    sf::Vector2f m_dims{0.0f, 0.0f};
+
     sf::Texture m_texture;
 
     sf::Sprite m_sprite;
@@ -20,6 +22,8 @@ class pattern
     void set_filename()
     {
         assert(m_filename != "");
+
+        std::cout << m_filename << '\n';
 
         if (!m_texture.loadFromFile(m_filename))
         {
@@ -32,10 +36,25 @@ class pattern
         m_sprite.setTexture(m_texture);
     }
 
+    void get_dims()
+    {
+        const sf::FloatRect dims{m_sprite.getLocalBounds()};
+
+        m_dims.x = dims.width;
+        m_dims.y = dims.height;
+    }
+
+    void set_center()
+    {
+        m_sprite.setOrigin(0.5f*m_dims);
+    }
+
     void set_color()
     {
         m_sprite.setColor(m_color);
     }
+
+
 
     void set_posit()
     {
@@ -44,7 +63,10 @@ class pattern
 
     void set_sprite()
     {
+        set_filename();
         set_texture();
+        get_dims();
+        set_center();
         set_color();
         set_posit();
     }
@@ -68,7 +90,8 @@ class pattern
         window.draw(m_sprite);
     }
 
-    pattern(const std::string& filename, const sf::Color& color,
+    pattern(const std::string& filename,
+            const sf::Color& color,
             const sf::Vector2f& posit)
         : m_filename(filename), m_color(color), m_posit(posit),
           m_texture(), m_sprite()
@@ -83,9 +106,10 @@ class pattern
 
 class tile
 {
+
+    const std::string m_filename{"Ripple_Square.png"};
+
     const sf::Vector2i m_posit;
-
-
 
     const sf::Color m_dark{63, 63, 63};
     const sf::Color m_grey{127, 127, 127};
@@ -93,7 +117,9 @@ class tile
 
     int m_type{1};
 
-    sf::Color m_color{m_dark};    
+    sf::Color m_color{m_dark};
+
+    pattern m_pattern;
 
     void color_tile()
     {
@@ -132,10 +158,13 @@ class tile
 
     public:
 
-
+    void display(sf::RenderWindow& window)
+    {
+        m_pattern.display(window);
+    }
 
     tile(const sf::Vector2i& posit, const int type)
-        : m_posit(posit), m_type(type)
+        : m_posit(posit), m_type(type), m_pattern(m_filename, m_color, static_cast<sf::Vector2f>(m_posit))
     {
         color_tile();
     }
@@ -157,6 +186,22 @@ int window_maker(const std::string& program_name, const float windim)
     sf::Time time;
 
     sf::Color black{0, 0, 0};
+    sf::Color white{255, 255, 255};
+
+    const std::string image_name{"Ripple_Square.png"};
+
+    const sf::Vector2f home{0.0f, 0.0f};
+
+
+    {
+        pattern patchy{image_name, white, home};
+    }
+
+    const sf::Vector2f middle{0.5f*windim, 0.5f*windim};
+
+    const sf::Vector2f upper_left{0.25f*windim, 0.25f*windim};
+
+    tile tily{static_cast<sf::Vector2i>(upper_left), 2};
 
     sf::RenderWindow window(sf::VideoMode(windim, windim), program_name, sf::Style::Default);
 
@@ -165,6 +210,11 @@ int window_maker(const std::string& program_name, const float windim)
         sf::Event event;
 
         window.clear(black);
+
+        // patchy.display(window);
+
+        tily.display(window);
+
         window.display();
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
