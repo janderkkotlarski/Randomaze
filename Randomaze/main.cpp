@@ -115,46 +115,54 @@ class tile
     const sf::Color m_grey{127, 127, 127};
     const sf::Color m_light{191, 191, 191};
 
-    int m_type{1};
+    const sf::Color m_dark_red{127, 63, 63};
+    const sf::Color m_dark_green{63, 127, 63};
+    const sf::Color m_dark_blue{63, 63, 127};
 
-    sf::Color m_color{m_dark};
+    const sf::Color m_light_red{191, 127, 127};
+    const sf::Color m_light_green{127, 191, 127};
+    const sf::Color m_light_blue{127, 127, 191};
+
+    int m_type{3};
+
+    sf::Color m_color;
 
     pattern m_pattern;
 
     void color_tile()
     {
-        const int a_type{abs(m_type)};
-
-        switch (a_type)
+        switch (m_type)
         {
             case 0:
-                m_color = m_light;
-            case 1:
                 m_color = m_dark;
+            case 1:
+                m_color = m_light_red;
             case 2:
+                m_color = m_light_green;
+            case 3:
+                m_color = m_light_blue;
+            case 10:
+                m_color = m_light;
+            case -1:
+                m_color = m_dark_red;
+            case -2:
+                m_color = m_dark_green;
+            case -3:
+                m_color = m_dark_blue;
+            case -10:
                 m_color = m_grey;
             default:
-                m_color = m_dark;
-                m_type = 1;
+                m_color = m_light_blue;
+                // m_type = 1;
         }
-    }
 
-    void change_tile()
-    {
-        if (m_type == -1)
+        if (m_type == -2)
         {
-            m_type = -3;
+            // m_color = m_dark_green;
         }
 
-        if (m_type == -3)
-        {
-            m_type = -1;
-        }
-
-        color_tile();
+        m_pattern.recolor(m_color);
     }
-
-
 
     public:
 
@@ -164,8 +172,10 @@ class tile
     }
 
     tile(const sf::Vector2i& posit, const int type)
-        : m_posit(posit), m_type(type), m_pattern(m_filename, m_color, static_cast<sf::Vector2f>(m_posit))
+        : m_posit(posit), m_type(type), m_color(m_dark), m_pattern(m_filename, m_color, static_cast<sf::Vector2f>(m_posit))
     {
+        std::cout << m_type << '\n';
+
         color_tile();
     }
 
@@ -180,7 +190,7 @@ class tile
 
 int window_maker(const std::string& program_name, const float windim)
 {
-    const float millis{10.0f};
+    const float seconds{30.0f};
 
     sf::Clock clock;
     sf::Time time;
@@ -193,15 +203,15 @@ int window_maker(const std::string& program_name, const float windim)
     const sf::Vector2f home{0.0f, 0.0f};
 
 
-    {
-        pattern patchy{image_name, white, home};
-    }
+
+    pattern patchy{image_name, white, home};
+
 
     const sf::Vector2f middle{0.5f*windim, 0.5f*windim};
 
     const sf::Vector2f upper_left{0.25f*windim, 0.25f*windim};
 
-    tile tily{static_cast<sf::Vector2i>(upper_left), 2};
+    tile tily{static_cast<sf::Vector2i>(upper_left), -2};
 
     sf::RenderWindow window(sf::VideoMode(windim, windim), program_name, sf::Style::Default);
 
@@ -211,7 +221,7 @@ int window_maker(const std::string& program_name, const float windim)
 
         window.clear(black);
 
-        // patchy.display(window);
+        patchy.display(window);
 
         tily.display(window);
 
@@ -234,7 +244,7 @@ int window_maker(const std::string& program_name, const float windim)
 
         time = clock.getElapsedTime();
 
-        if(time.asSeconds() > millis)
+        if(time.asSeconds() > seconds)
         {
             window.close();
             return 0;
