@@ -5,15 +5,25 @@
 
 #include <SFML/Graphics.hpp>
 
+sf::Vector2i divide(const sf::Vector2i& numerator, const int denominator)
+{
+    return sf::Vector2i (numerator.x/denominator, numerator.y/denominator);
+}
+
+sf::Vector2f Vect_i2f(const sf::Vector2i& vecti)
+{
+    return static_cast<sf::Vector2f>(vecti);
+}
+
 class pattern
 {
     const std::string m_filename{"Tile.png"};
 
     sf::Color m_color;
 
-    sf::Vector2f m_posit;
+    sf::Vector2i m_posit;
 
-    sf::Vector2f m_dims{0.0f, 0.0f};
+    sf::Vector2i m_dims{0, 0};
 
     sf::Texture m_texture;
 
@@ -38,16 +48,16 @@ class pattern
     {
         const sf::FloatRect dims{m_sprite.getLocalBounds()};
 
-        assert(dims.width > 0.001f);
-        assert(dims.height > 0.001f);
+        assert(dims.width > 0);
+        assert(dims.height > 0);
 
-        m_dims.x = dims.width;
-        m_dims.y = dims.height;
+        m_dims.x = static_cast<int>(dims.width);
+        m_dims.y = static_cast<int>(dims.height);
     }
 
     void set_center()
     {
-        m_sprite.setOrigin(0.5f*m_dims);
+        m_sprite.setOrigin(Vect_i2f(m_dims/2));
     }
 
     void set_color()
@@ -57,7 +67,7 @@ class pattern
 
     void set_posit()
     {
-        m_sprite.setPosition(m_posit);
+        m_sprite.setPosition(Vect_i2f(m_posit));
     }
 
     void set_sprite()
@@ -74,7 +84,7 @@ class pattern
 
     void reposit(const sf::Vector2i& posit)
     {
-        m_posit = static_cast<sf::Vector2f>(posit);
+        m_posit = posit;
         set_posit();
     }
 
@@ -89,14 +99,14 @@ class pattern
         window.draw(m_sprite);
     }
 
-    sf::Vector2f output_dims()
+    sf::Vector2i output_dims()
     {
         return m_dims;
     }
 
     pattern(const std::string& filename,
             const sf::Color& color,
-            const sf::Vector2f& posit)
+            const sf::Vector2i& posit)
         : m_filename(filename), m_color(color), m_posit(posit),
           m_texture(), m_sprite()
     {
@@ -129,11 +139,13 @@ class tile
 
     sf::Vector2i m_direction{0, 0};
 
-    int m_moves{0};
-
     int m_type{3};
 
     const sf::Vector2i m_stepdims;
+
+    const int m_steps{1};
+
+    int m_moves{0};
 
     sf::Color m_color;
 
@@ -152,35 +164,38 @@ class tile
         reposit();
     }
 
-    void stepping()
+    void keystep()
     {
         if (m_moves == 0)
         {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             {
                 m_direction = sf::Vector2i(1, 0);
-                m_moves = 16;
+                m_moves = m_steps;
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
             {
                 m_direction = sf::Vector2i(-1, 0);
-                m_moves = 16;
+                m_moves = m_steps;
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
             {
                 m_direction = sf::Vector2i(0, -1);
-                m_moves = 16;
+                m_moves = m_steps;
             }
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
                 m_direction = sf::Vector2i(0, 1);
-                m_moves = 16;
+                m_moves = m_steps;
             }
         }
+    }
 
+    void movic()
+    {
         if (m_moves > 0)
         {
             steps();
@@ -190,6 +205,15 @@ class tile
             {
                 m_direction = sf::Vector2i(0, 0);
             }
+        }
+    }
+
+    void stepping()
+    {
+        if (m_type > 0)
+        {
+            keystep();
+            movic();
         }
     }
 
@@ -248,15 +272,16 @@ class tile
         m_pattern.display(window);
     }
 
-    sf::Vector2f output_dims()
+    sf::Vector2i output_dims()
     {
         return m_pattern.output_dims();
     }
 
-    tile(const sf::Vector2f& posit, const int type, const sf::Vector2f stepdims)
-        : m_posit(static_cast<sf::Vector2i>(posit)), m_type(type),
-          m_stepdims(static_cast<sf::Vector2i>(stepdims)), m_color(m_dark),
-          m_pattern(m_filename, m_color, static_cast<sf::Vector2f>(m_posit))
+    tile(const sf::Vector2i& posit, const int type, const sf::Vector2i stepdims,
+         const int steps)
+        : m_posit(posit), m_type(type), m_stepdims(stepdims),
+          m_steps(steps), m_color(m_dark),
+          m_pattern(m_filename, m_color, m_posit)
     {
         color_tile();
     }
@@ -284,18 +309,20 @@ int window_maker(const std::string& program_name)
 
     const std::string image_name{"Ripple_Square.png"};
 
-    const sf::Vector2f home{0.0f, 0.0f};
+    const sf::Vector2i home{0, 0};
+
+    const int step_div{8};
 
     pattern patchy{image_name, invis, home};
 
-    const sf::Vector2f tiledims{patchy.output_dims()};
-    const sf::Vector2f stepdims{tiledims/16.0f};
-    const sf::Vector2f windims{5.0f*tiledims};
-    const sf::Vector2f middle{0.5f*windims};
+    const sf::Vector2i tiledims{patchy.output_dims()};
+    const sf::Vector2i stepdims{tiledims/step_div};
+    const sf::Vector2i windims{5*tiledims};
+    const sf::Vector2i middle{windims/2};
 
-    const sf::Vector2f upper_left{0.25f*windims.x, 0.25f*windims.y};
+    const sf::Vector2i upper_left{windims/4};
 
-    tile tily{middle, -2, stepdims};
+    tile tily{middle, 10, stepdims, step_div};
 
     sf::RenderWindow window(sf::VideoMode(windims.x, windims.y), program_name, sf::Style::Default);
 
