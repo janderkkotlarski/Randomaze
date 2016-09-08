@@ -303,9 +303,9 @@ int window_maker(const std::string& program_name)
     sf::Clock clock;
     sf::Time time;
 
-    sf::Color black{0, 0, 0};
-    sf::Color white{255, 255, 255};
-    sf::Color invis{0, 0, 0, 0};
+    const sf::Color black{0, 0, 0};
+    const sf::Color white{255, 255, 255};
+    const sf::Color invis{0, 0, 0, 0};
 
     const std::string image_name{"Ripple_Square.png"};
 
@@ -313,16 +313,39 @@ int window_maker(const std::string& program_name)
 
     const int step_div{8};
 
+    const int size{10};
+
     pattern patchy{image_name, invis, home};
 
     const sf::Vector2i tiledims{patchy.output_dims()};
     const sf::Vector2i stepdims{tiledims/step_div};
-    const sf::Vector2i windims{5*tiledims};
+    const sf::Vector2i windims{size*tiledims};
     const sf::Vector2i middle{windims/2};
 
-    const sf::Vector2i upper_left{windims/4};
+    const sf::Vector2i halfdims{tiledims/2};
+    const sf::Vector2i startdims{middle - halfdims};
 
-    tile tily{middle, 10, stepdims, step_div};
+    const sf::Vector2i delta_x{tiledims.x, 0};
+    const sf::Vector2i delta_y{0, tiledims.y};
+
+
+    tile tily{startdims, 10, stepdims, step_div};
+
+    std::vector<std::vector<tile>> area;
+
+    for (int count_y{0}; count_y < size; ++count_y)
+    {
+        std::vector<tile> strip;
+
+        for (int count_x{0}; count_x < size; ++count_x)
+        {
+            const sf::Vector2i posit{halfdims + count_x*delta_x + count_y*delta_y};
+
+            strip.push_back(tile (posit, -2, stepdims, step_div));
+        }
+
+        area.push_back(strip);
+    }
 
     sf::RenderWindow window(sf::VideoMode(windims.x, windims.y), program_name, sf::Style::Default);
 
@@ -334,6 +357,14 @@ int window_maker(const std::string& program_name)
         sf::Event event;
 
         window.clear(black);
+
+        for (int count_y{0}; count_y < size; ++count_y)
+        {
+            for (int count_x{0}; count_x < size; ++count_x)
+            {
+                area[count_x][count_y].display(window);
+            }
+        }
 
         tily.display(window);
 
