@@ -342,8 +342,7 @@ int window_maker(const std::string& program_name)
         for (int count_x{0}; count_x < size; ++count_x)
         {
             const sf::Vector2i posit{halfdims + count_x*delta_x + count_y*delta_y};
-            // std::cout << posit.x << " : " << posit.y << "\n";
-            strip.push_back(tile (posit, -2, stepdims, step_div));
+            strip.push_back(tile (posit, -((count_x + count_y) % 3) - 1, stepdims, step_div));
         }
 
         area.push_back(strip);
@@ -360,12 +359,6 @@ int window_maker(const std::string& program_name)
 
         window.clear(black);
 
-        std::cout << area[9].size() << " Reached!\n";
-
-        area[9][9].display(window);
-
-        std::cout << area[9].size() << " Reached!\n";
-
         for (int count_y{0}; count_y < size; ++count_y)
         {
             for (int count_x{0}; count_x < size; ++count_x)
@@ -373,8 +366,6 @@ int window_maker(const std::string& program_name)
                 area[count_x][count_y].display(window);
             }
         }
-
-        std::cout << area[9].size() << " Reached!\n";
 
         tily.display(window);
 
